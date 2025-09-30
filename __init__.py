@@ -1,5 +1,5 @@
 """Module SnakeScan"""
-__version__="1.2.8"
+__version__="1.2.9"
 import socket
 from art import tprint
 from datetime import datetime
@@ -86,6 +86,20 @@ while Run_now:
 	    host=host.strip("https:")
 	    host=host.strip("//")
 	    host=host+""+"--d"
+	    for i in range(len(host)):
+	        if host[i] == "/":
+	           host=host[0:i]
+	if "http://" in host:
+	    host=host.strip()
+	    host=host.split("http:")
+	    host=host.strip("//")
+	    for i in range(len(host)):
+	        if host[i] == "/":
+	           host=host[0:i]
+	if "https://" in host:
+	    host=host.strip()
+	    host=host.strip("https:")
+	    host=host.strip("//")
 	    for i in range(len(host)):
 	        if host[i] == "/":
 	           host=host[0:i]

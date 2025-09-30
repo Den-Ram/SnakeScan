@@ -13,9 +13,7 @@ added new single search:
 requires-python=>3.9
 
 added new check all port search:
-
  [$]Port--> --a 
- 
 added new check all port using thread:
  [$]Port--> --t 
  added new dos attack:
