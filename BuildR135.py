@@ -1,5 +1,5 @@
 """Module SnakeScan using to scan port or ports in you device or other devices"""
-__version__="1.4.0"
+__version__="1.3.5"
 import socket
 from art import tprint
 from datetime import datetime
@@ -19,7 +19,7 @@ ports = {
     20: "FTP-DATA", 21: "FTP", 22: "SSH", 23: "Telnet",
     25: "SMTP", 43: "WHOIS", 53: "DNS", 67:"DHCP", 68:"DHCP", 69:"TFTP", 80: "http", 110:"POP3",
     115: "SFTP", 123: "NTP", 139:"NetBios", 143: "IMAP", 161: "SNMP",
-    179: "BGP", 443: "HTTPS", 445: "MICROSOFT-DS", 465:"SSL/TLS",
+    179: "BGP", 389:"LDAP", 443: "HTTPS", 445: "MICROSOFT-DS", 465:"SSL/TLS",
     514: "SYSLOG", 515: "PRINTER", 554:"RTSP", 587:"TLS/STARTTLS", 993: "IMAPS",
     995: "POP3S", 1080: "SOCKS", 1194: "OpenVPN",
     1433: "SQL Server", 1723: "PPTP", 2222:"SSH", 3128: "HTTP",
@@ -71,7 +71,7 @@ tprint("SnakeScan")
 print("–"*60)
 print(f"{__version__}".rjust(60))
 print(f"Skip{colored('|*|','blue')}Error: {colored('Host','green')}{colored('[X]:Error','red')} {colored('|$|','green')} {colored('Port','green')}{colored('[X]:Error','red')}")
-print("Host:[host --i,host --d] Port:[--s port,--a,--t]")
+print("Host:[--l,host --i,host --d] Port:[--s port,--a,--t]")
 while Run_now:
 	host=input(f"{colored('[$]','green')}Host-->")
 	if "--i" in host:
@@ -219,10 +219,13 @@ while Run_now:
 			                           print(f"Closed{colored('|X|','red')}-->|{all}|")
 			           continue
 			   if "--s" in str(port_user):
-			       port_user=port_single.strip("--s")
-			       port_user=port_user.split()
+			       port_user=port_single.strip().strip("--s")[1:len(port_user)]
+			       for i in range(len(port_user)):
+			           if port_user[i] == " ":
+			               port_user=port_user[0:i]
+			               break
 			       try:
-			           port_user=int(port_user[0])
+			           port_user=int(port_user)
 			       except:
 			           port_user="None"
 			       for singel in range(1):

